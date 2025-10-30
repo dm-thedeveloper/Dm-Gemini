@@ -5,13 +5,7 @@ import { Header } from '../components/Header'
 import { ChatSidebar } from '../components/ChatSidebar'
 import { ChatArea } from '../components/ChatArea'
 import { InputBar } from '../components/InputBar'
-
-interface Message {
-  id: string
-  // role: 'user' | 'assistant'
-  response: string
-  title: string
-}
+import { Message } from '@/types'
 
 interface Chat {
   id: string

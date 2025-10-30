@@ -5,20 +5,8 @@ import { User, Sparkles } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { Message } from '@/types'
 
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  response?: string
-  title?: string
-}
-
-interface obj {
-  id: string
-  title: string
-  responses: string
-}
 interface ChatAreaProps {
   messages: Message[]
   loading?: boolean
