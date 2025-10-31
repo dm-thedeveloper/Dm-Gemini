@@ -1,17 +1,12 @@
-// Get chat by ID
 import ConnectToMongoDB from '@/lib/connectdb'
 import ChatSession from '@/models/chat'
 import { NextRequest, NextResponse } from 'next/server'
 import mongoose from 'mongoose'
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+
+export async function GET(req: NextRequest, context: any) {
   try {
     await ConnectToMongoDB()
-    const { id } = params
-
-    console.log('Params', id)
+    const { id } = context.params // runtime access is fine
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -19,6 +14,7 @@ export async function GET(
         { status: 400 },
       )
     }
+
     const chatSession = await ChatSession.findById(id)
     if (!chatSession) {
       return NextResponse.json(
@@ -26,9 +22,18 @@ export async function GET(
         { status: 404 },
       )
     }
+
+    const filteredChats = chatSession.chats.map((chat: any) => ({
+      id: chat._id,
+      title: chat.title,
+      response: chat.response,
+    }))
+
     return NextResponse.json({
-      //   chatSession: chatSession.chats.length,
-      chatSession,
+      _id: chatSession._id,
+      title: chatSession.SectionTitle,
+      chats: filteredChats,
+      createdAt: chatSession.createdAt,
     })
   } catch (error: any) {
     console.error('Error fetching chat by ID:', error)
