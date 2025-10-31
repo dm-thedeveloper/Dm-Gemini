@@ -1,6 +1,7 @@
 import ConnectToMongoDB from '@/lib/connectdb'
 import ChatSession from '@/models/chat'
 import { NextRequest, NextResponse } from 'next/server'
+import { withCors } from '@/lib/cors'
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,7 +19,10 @@ export async function GET(req: NextRequest) {
       createdAt: chat.createdAt,
     }))
 
-    return NextResponse.json({ chatSessions: formattedChats })
+    const response = NextResponse.json({ chatSessions: formattedChats })
+
+    // return NextResponse.json({ chatSessions: formattedChats })
+    return withCors(response)
   } catch (error: any) {
     console.error('Error fetching chats:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

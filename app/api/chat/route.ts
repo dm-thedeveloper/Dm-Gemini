@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const allowedOrigins = [
   'https://dm-gemini-v3.vercel.app', // your Vercel domain
-  // 'http://localhost:3000', // local development
+  'http://localhost:3000', // local development
 ]
 
 export async function POST(req: NextRequest) {

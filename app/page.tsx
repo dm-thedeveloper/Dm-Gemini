@@ -89,7 +89,8 @@ export default function Home() {
         )
         sessionStorage.setItem('sectionId', chatId)
         setMessages(filteredChats)
-        // console.log('filtered', filteredChats)
+
+        console.log('filtered', filteredChats)
       }
       // console.log('A Section Data', data.chatSession.chats)
       // const chatsSectionsObjects = data.chatSession.chats
