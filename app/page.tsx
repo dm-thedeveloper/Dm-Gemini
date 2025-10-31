@@ -6,6 +6,7 @@ import { ChatSidebar } from '../components/ChatSidebar'
 import { ChatArea } from '../components/ChatArea'
 import { InputBar } from '../components/InputBar'
 import { Message } from '@/types'
+import { appEndpoint } from '@/constants'
 
 interface Chat {
   id: string
@@ -20,51 +21,82 @@ interface CurrentChat {
 }
 
 export default function Home() {
-  const [chats, setChats] = useState<Chat[]>([
-    {
-      id: '1',
-      title: 'What is artificial intelligence?',
-      timestamp: '2 hours ago',
-    },
-    {
-      id: '2',
-      title: 'Help me write a story',
-      timestamp: 'Yesterday',
-    },
-    {
-      id: '3',
-      title: 'Explain quantum computing',
-      timestamp: '3 days ago',
-    },
-    {
-      id: '4',
-      title: 'Creative writing tips',
-      timestamp: '1 week ago',
-    },
-  ])
-
   const [activeChat, setActiveChat] = useState<string | null>(null)
   // const [messages, setMessages] = useState<Message[]>([])
   const [messages, setMessages] = useState<Message[]>(() => {
-    // ✅ Load from sessionStorage (on first render)
     if (typeof window !== 'undefined') {
       const saved = sessionStorage.getItem('dm_gemini_messages')
-      return saved ? JSON.parse(saved) : []
+      if (saved && saved !== 'undefined') {
+        try {
+          return JSON.parse(saved)
+        } catch (e) {
+          console.error('Failed to parse sessionStorage messages:', e)
+          return []
+        }
+      }
     }
     return []
   })
+
   const [chatLoading, setChatLoading] = useState(false)
+  const [sectionId, setSectionId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const storedSectionId = sessionStorage.getItem('sectionId')
+      return storedSectionId ? storedSectionId : null
+    }
+    return null
+  })
+
+  useEffect(() => {
+    const storedSectionId = sessionStorage.getItem('sectionId')
+    if (storedSectionId) {
+      setSectionId(storedSectionId)
+    }
+  }, [sectionId, messages])
+
+  // console.log('sectionId', sectionId)
 
   const handleNewChat = () => {
     setActiveChat(null)
     setMessages([])
+    // update to null SessionId from Session Storage
+    // sessionStorage.removeItem('sectionId')
+    sessionStorage.removeItem('sectionId') // ✅ proper way
+    setSectionId(null) // ✅ reset in state also
   }
 
-  const handleSelectChat = (chatId: string) => {
+  const handleSelectChat = async (chatId: string) => {
     setActiveChat(chatId)
+    // alert(chatId)
     // Load mock messages for the selected chat
 
-    setMessages([])
+    try {
+      const response = await fetch(`${appEndpoint}/api/chats/${chatId}`, {
+        method: 'GET',
+      })
+
+      const data = await response.json()
+      if (data) {
+        const filteredChats = data.chatSession.chats?.map((chat: any) => ({
+          id: chat._id,
+          title: chat.title,
+          response: chat.response || '', // first message response
+        }))
+
+        sessionStorage.setItem(
+          'dm_gemini_messages',
+          JSON.stringify(filteredChats),
+        )
+        sessionStorage.setItem('sectionId', chatId)
+        setMessages(filteredChats)
+        // console.log('filtered', filteredChats)
+      }
+      // console.log('A Section Data', data.chatSession.chats)
+      // const chatsSectionsObjects = data.chatSession.chats
+    } catch (error) {
+      console.log('A Section  Fetched Failed', error)
+    }
+    // setMessages([])
   }
 
   const handleSendMessage = (object: CurrentChat) => {
@@ -116,7 +148,8 @@ export default function Home() {
       {/* Main layout */}
       <Header />
       <ChatSidebar
-        chats={chats}
+        // chats={chats}
+
         activeChat={activeChat}
         onSelectChat={handleSelectChat}
         onNewChat={handleNewChat}
@@ -127,6 +160,8 @@ export default function Home() {
         <InputBar
           onSendMessage={handleSendMessage}
           setChatLoading={setChatLoading}
+          sectionId={sectionId}
+          setSectionId={setSectionId}
         />
       </main>
     </div>

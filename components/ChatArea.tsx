@@ -21,9 +21,17 @@ export function ChatArea({ messages, loading }: ChatAreaProps) {
     <ScrollArea className="flex-1 h-full  px-6 pt-8 overflow-y-auto">
       {messages.length === 0 ? (
         <div className="flex flex-col  items-center justify-center h-full text-center">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-6 shadow-2xl">
-            <Sparkles className="w-10 h-10 text-white" />
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-6 shadow-2xl overflow-hidden">
+            <video
+              src="/logo.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover rounded-full"
+            />
           </div>
+
           <h2 className="text-white/90 mb-2">Welcome to DM-Gemini</h2>
           <p className="text-white/60 max-w-md">
             Your intelligent AI assistant. Start a conversation by typing a

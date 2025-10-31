@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
 import { Button } from './ui/button'
 import { Textarea } from './ui/textarea'
@@ -10,18 +10,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip'
-import appEndpoint from '@/constants'
+import { appEndpoint } from '@/constants'
+import { title } from 'process'
 
 interface InputBarProps {
   onSendMessage: any
   disabled?: boolean
   setChatLoading: any
+  sectionId: string | null
+  setSectionId: any
 }
 
 export function InputBar({
   onSendMessage,
   disabled,
   setChatLoading,
+  sectionId,
+  setSectionId,
 }: InputBarProps) {
   const [message, setMessage] = useState('')
   const InputRef = useRef<HTMLTextAreaElement>(null)
@@ -62,11 +67,51 @@ export function InputBar({
         responses: data.reply,
       })
 
-      setMessage('') // clear input
+      if (data) {
+        setChatLoading(false)
+        setMessage('') // clear input
+
+        if (!sectionId) {
+          // Create a New Section
+          const saveChatResponse = await fetch(
+            `${appEndpoint}/api/save-chats`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                title: message,
+                response: data.reply,
+                sectionId: null,
+                SectionTitle: ` Chat Title ${message}`,
+              }),
+            },
+          )
+          const saveChatData = await saveChatResponse.json()
+          const newSectionId = saveChatData.sectionId
+          setSectionId(newSectionId)
+          sessionStorage.setItem('sectionId', newSectionId)
+          console.log('Created new section chat', saveChatData.sectionId)
+        } else {
+          // Update Existing Section or Push just Chat Messages
+          const saveChatResponse = await fetch(
+            `${appEndpoint}/api/save-chats`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                title: message,
+                response: data.reply,
+                sectionId: sectionId,
+              }),
+            },
+          )
+          const saveChatData = await saveChatResponse.json()
+          console.log('Updated existing section chat', saveChatData.sectionId)
+        }
+      }
     } catch (error) {
       console.error('Error fetching AI response:', error)
     } finally {
-      setChatLoading(false)
     }
   }
 

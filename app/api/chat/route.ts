@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
     })
 
     const data = await response.json()
+    // console.log('Data', data)
+
     const output =
       data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from AI'
 
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest) {
     if (allowedOrigins.includes(origin)) {
       res.headers.set('Access-Control-Allow-Origin', origin)
     }
-    res.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    res.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS , GET')
     res.headers.set('Access-Control-Allow-Headers', 'Content-Type')
     return res
   } catch (err) {
