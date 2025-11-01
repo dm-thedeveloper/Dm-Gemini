@@ -78,8 +78,8 @@ export default function Home() {
       const data = await response.json()
       // console.log('DAta', data.chats)
 
-      if (data) {
-        const filteredChats = data?.chats?.map((chat: any) => ({
+      if (data?.chats.length > 0) {
+        const filteredChats = data?.chats.map((chat: any) => ({
           id: chat._id,
           title: chat.title,
           response: chat.response || '', // first message response
