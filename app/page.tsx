@@ -76,8 +76,10 @@ export default function Home() {
       })
 
       const data = await response.json()
+      // console.log('DAta', data.chats)
+
       if (data) {
-        const filteredChats = data.chatSession.chats?.map((chat: any) => ({
+        const filteredChats = data?.chats?.map((chat: any) => ({
           id: chat._id,
           title: chat.title,
           response: chat.response || '', // first message response
@@ -90,7 +92,7 @@ export default function Home() {
         sessionStorage.setItem('sectionId', chatId)
         setMessages(filteredChats)
 
-        console.log('filtered', filteredChats)
+        // console.log('filtered', filteredChats)
       }
       // console.log('A Section Data', data.chatSession.chats)
       // const chatsSectionsObjects = data.chatSession.chats

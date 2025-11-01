@@ -2,6 +2,7 @@ import ConnectToMongoDB from '@/lib/connectdb'
 import ChatSession from '@/models/chat'
 import { NextRequest, NextResponse } from 'next/server'
 import mongoose from 'mongoose'
+import { withCors } from '@/lib/cors'
 
 export async function GET(req: NextRequest, context: any) {
   try {
@@ -29,12 +30,20 @@ export async function GET(req: NextRequest, context: any) {
       response: chat.response,
     }))
 
-    return NextResponse.json({
+    // return NextResponse.json({
+    //   _id: chatSession._id,
+    //   title: chatSession.SectionTitle,
+    //   chats: filteredChats,
+    //   createdAt: chatSession.createdAt,
+    // })
+
+    const responseData = {
       _id: chatSession._id,
       title: chatSession.SectionTitle,
       chats: filteredChats,
       createdAt: chatSession.createdAt,
-    })
+    }
+    return withCors(responseData)
   } catch (error: any) {
     console.error('Error fetching chat by ID:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

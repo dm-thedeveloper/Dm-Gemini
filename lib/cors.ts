@@ -1,16 +1,19 @@
 import { NextResponse } from 'next/server'
 
-export function corsHeaders() {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  }
-}
+export function withCors(data: any, status: number = 200) {
+  // Convert data to JSON string before passing
+  const json = JSON.parse(JSON.stringify(data))
 
-export function withCors(response: NextResponse) {
-  Object.entries(corsHeaders()).forEach(([key, value]) => {
-    response.headers.set(key, value)
-  })
+  const response = NextResponse.json(json, { status })
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, DELETE, OPTIONS',
+  )
+  response.headers.set(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization',
+  )
+
   return response
 }

@@ -59,11 +59,10 @@ export function ChatSidebar({
 
       const data = await response.json()
 
-      if (data.chatSessions.length > 0) {
-        console.log('Data', data.chatSessions)
-
+      if (data.chatSessions?.length > 0) {
+        // console.log('Data', data.chatSessions)
         setChats(data.chatSessions)
-        console.log('Side Bar Data', data)
+        // console.log('Side Bar Data', data)
       }
     } catch (error) {
       console.log('Error on Ferch Chats', error)
@@ -95,6 +94,7 @@ export function ChatSidebar({
               {Array.from({ length: 7 }).map((_, idx) => (
                 <>
                   <button
+                    key={idx * 1222}
                     className={`w-full cursor-not-allowed animate-pulse text-left p-4 rounded-xl backdrop-blur-md transition-all duration-300 border bg-white/5 border-white/10 `}
                   >
                     <div className="flex items-start gap-3">

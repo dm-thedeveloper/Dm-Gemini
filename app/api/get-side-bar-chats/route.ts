@@ -19,10 +19,12 @@ export async function GET(req: NextRequest) {
       createdAt: chat.createdAt,
     }))
 
-    const response = NextResponse.json({ chatSessions: formattedChats })
+    // const response = NextResponse.json({ chatSessions: formattedChats })
 
     // return NextResponse.json({ chatSessions: formattedChats })
-    return withCors(response)
+    return withCors({ chatSessions: formattedChats })
+
+    // return withCors(response)
   } catch (error: any) {
     console.error('Error fetching chats:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

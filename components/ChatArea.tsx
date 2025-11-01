@@ -19,7 +19,7 @@ export function ChatArea({ messages, loading }: ChatAreaProps) {
   }, [messages, loading])
   return (
     <ScrollArea className="flex-1 h-full  px-6 pt-8 overflow-y-auto">
-      {messages.length === 0 ? (
+      {messages?.length === 0 ? (
         <div className="flex flex-col  items-center justify-center h-full text-center">
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-6 shadow-2xl overflow-hidden">
             <video
@@ -40,8 +40,8 @@ export function ChatArea({ messages, loading }: ChatAreaProps) {
         </div>
       ) : (
         <div className="max-w-4xl mx-auto space-y-6">
-          {messages.map((message, index) => {
-            const isLast = index === messages.length - 1 // ✅ last message check
+          {messages?.map((message, index) => {
+            const isLast = index === messages?.length - 1 // ✅ last message check
 
             return (
               <div key={message.id} ref={isLast ? scrollRef : null}>

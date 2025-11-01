@@ -1,4 +1,5 @@
 import ConnectToMongoDB from '@/lib/connectdb'
+import { withCors } from '@/lib/cors'
 import ChatSession from '@/models/chat'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -35,7 +36,12 @@ export async function POST(req: NextRequest) {
       })
       console.log(createChat)
 
-      return NextResponse.json({
+      // return NextResponse.json({
+      //   message: 'Created new chat session',
+      //   sectionId: createChat._id.toString(),
+      // })
+
+      return withCors({
         message: 'Created new chat session',
         sectionId: createChat._id.toString(),
       })
