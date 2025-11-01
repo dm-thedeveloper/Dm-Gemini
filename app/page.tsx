@@ -159,6 +159,7 @@ export default function Home() {
       />
 
       <main className="fixed top-16 left-72  right-0 bottom-0 flex flex-col">
+        {appEndpoint}
         <ChatArea messages={messages} loading={chatLoading} />
         <InputBar
           onSendMessage={handleSendMessage}
