@@ -3,14 +3,11 @@ import ChatSession from '@/models/chat'
 import { NextRequest, NextResponse } from 'next/server'
 import { withCors } from '@/lib/cors'
 
-export async function GET(
-  req: NextRequest,
-  context: { params: { email: string } },
-) {
+export async function GET(req: NextRequest, context: any) {
   try {
     await ConnectToMongoDB()
 
-    const { email } = context.params
+    const email = context?.params?.email
     console.log('Email', email)
 
     // Get only specific fields
