@@ -6,9 +6,15 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          redirect_uri:
+            'https://dm-gemini-v3.vercel.app/api/auth/callback/google', // Must match Google console
+        },
+      },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXT_AUTHSECRET,
 
   session: {
     strategy: 'jwt',
