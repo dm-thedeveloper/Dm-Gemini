@@ -3,12 +3,18 @@ import ChatSession from '@/models/chat'
 import { NextRequest, NextResponse } from 'next/server'
 import { withCors } from '@/lib/cors'
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { email: string } },
+) {
   try {
     await ConnectToMongoDB()
 
+    const { email } = context.params
+    console.log('Email', email)
+
     // Get only specific fields
-    const chatSessions = await ChatSession.find()
+    const chatSessions = await ChatSession.find({ userEmail: email })
       .select('_id createdAt SectionTitle')
       .sort({ createdAt: -1 })
 

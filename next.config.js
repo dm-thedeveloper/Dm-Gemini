@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [],
+    domains: ["lh3.googleusercontent.com"], // ✅ remove https://
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

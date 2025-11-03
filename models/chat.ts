@@ -10,6 +10,7 @@ interface IChat {
 // Pure Session ka type (ek array of chats)
 export interface IChatSession extends Document {
   sessionId: string
+  userEmail: string
   chats: IChat[]
   SectionTitle: string
 }
@@ -27,6 +28,7 @@ const ChatSchema = new Schema<IChat>(
 const ChatSessionSchema = new Schema<IChatSession>(
   {
     SectionTitle: { type: String, required: true },
+    userEmail: { type: String },
     chats: [ChatSchema], // 👈 Array of chat objects
   },
   {

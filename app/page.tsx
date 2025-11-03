@@ -5,8 +5,13 @@ import { Header } from '../components/Header'
 import { ChatSidebar } from '../components/ChatSidebar'
 import { ChatArea } from '../components/ChatArea'
 import { InputBar } from '../components/InputBar'
-import { Message } from '@/types'
+import { Message, SideBarChats } from '@/types'
 import { appEndpoint } from '@/constants'
+
+import { useSession } from 'next-auth/react'
+import LogoutButton from '@/components/LogOut'
+import AuthLayout from '@/components/AuthLaout'
+import { PanelRight, PanelRightClose } from 'lucide-react'
 
 interface Chat {
   id: string
@@ -37,6 +42,10 @@ export default function Home() {
     }
     return []
   })
+  const [sideBarChats, setSideBarChats] = useState<SideBarChats[]>([])
+  const [openSideBAr, setOpenSideBar] = useState(false)
+
+  const { data: session } = useSession()
 
   const [chatLoading, setChatLoading] = useState(false)
   const [sectionId, setSectionId] = useState<string | null>(() => {
@@ -142,32 +151,50 @@ export default function Home() {
   }, [messages])
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-cyan-900 overflow-hidden">
-      {/* Animated glow effects */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+    <AuthLayout>
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-cyan-900 overflow-hidden">
+        {/* Animated glow effects */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        {/* Main layout */}
+        <Header />
 
-      {/* Main layout */}
-      <Header />
-      <ChatSidebar
-        // chats={chats}
+        {/* Side Bar open Button */}
 
-        activeChat={activeChat}
-        onSelectChat={handleSelectChat}
-        onNewChat={handleNewChat}
-      />
-
-      <main className="fixed top-16 left-72  right-0 bottom-0 flex flex-col">
-        {appEndpoint}
-        <ChatArea messages={messages} loading={chatLoading} />
-        <InputBar
-          onSendMessage={handleSendMessage}
-          setChatLoading={setChatLoading}
-          sectionId={sectionId}
-          setSectionId={setSectionId}
+        <ChatSidebar
+          openSideBar={openSideBAr}
+          setOpenSidebar={setOpenSideBar}
+          // chats={chats}
+          chats={sideBarChats}
+          setSideBarChats={setSideBarChats}
+          activeChat={activeChat}
+          onSelectChat={handleSelectChat}
+          onNewChat={handleNewChat}
         />
-      </main>
-    </div>
+        <main className="fixed top-16 left-0 sm:left-72 right-0 bottom-0 flex flex-col">
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              setOpenSideBar(true)
+            }}
+            className="h-10 w-10  cursor-pointer backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-lg sm:hidden flex justify-center items-center text-white absolute -left-2 top-1/2 z-50 hover:scale-110"
+          >
+            {/* <PanelRight />{' '} */}
+            <PanelRightClose />
+          </button>
+          {/* {appEndpoint} */}
+          {/* <LogoutButton /> */}
+          <ChatArea messages={messages} loading={chatLoading} />
+          <InputBar
+            setSideBarChats={setSideBarChats}
+            onSendMessage={handleSendMessage}
+            setChatLoading={setChatLoading}
+            sectionId={sectionId}
+            setSectionId={setSectionId}
+          />
+        </main>
+      </div>
+    </AuthLayout>
   )
 }

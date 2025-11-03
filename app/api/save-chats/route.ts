@@ -7,20 +7,19 @@ export async function POST(req: NextRequest) {
   try {
     await ConnectToMongoDB()
 
-    const { title, response, sectionId, SectionTitle } = await req.json()
-    console.log(SectionTitle)
+    const { title, response, sectionId, SectionTitle, userEmail } =
+      await req.json()
+    // console.log(SectionTitle)
 
     if (sectionId) {
       // Update existing chat session
       const findChatSection = await ChatSession.findById(sectionId)
-
       if (!findChatSection) {
         return NextResponse.json(
           { error: 'Chat section not found' },
           { status: 404 },
         )
       }
-
       findChatSection.chats.push({ title, response })
       await findChatSection.save()
 
@@ -30,8 +29,15 @@ export async function POST(req: NextRequest) {
       })
     } else {
       // Create new chat session
+      if (!userEmail) {
+        return NextResponse.json(
+          { error: 'User Email is Required' },
+          { status: 404 },
+        )
+      }
       const createChat = await ChatSession.create({
         SectionTitle,
+        userEmail,
         chats: [{ title, response }],
       })
       console.log(createChat)

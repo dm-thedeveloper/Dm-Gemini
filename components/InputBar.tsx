@@ -1,17 +1,16 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+
 import { Send } from 'lucide-react'
 import { Button } from './ui/button'
 import { Textarea } from './ui/textarea'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from './ui/tooltip'
+
 import { appEndpoint } from '@/constants'
 import { title } from 'process'
+import TooltipComp from './TooltipComponent'
+import { useSession } from 'next-auth/react'
+import { SideBarChats } from '@/types'
 
 interface InputBarProps {
   onSendMessage: any
@@ -19,6 +18,8 @@ interface InputBarProps {
   setChatLoading: any
   sectionId: string | null
   setSectionId: any
+  // setSideBarChats: React.Dispatch<React.SetStateAction<string[]>>
+  setSideBarChats: React.Dispatch<React.SetStateAction<SideBarChats[]>>
 }
 
 export function InputBar({
@@ -27,9 +28,32 @@ export function InputBar({
   setChatLoading,
   sectionId,
   setSectionId,
+  setSideBarChats,
 }: InputBarProps) {
   const [message, setMessage] = useState('')
   const InputRef = useRef<HTMLTextAreaElement>(null)
+  const { data: session } = useSession()
+
+  const fetchAllChats = async () => {
+    try {
+      const response = await fetch(
+        `${appEndpoint}/api/get-side-bar-chats/${session?.user?.email}`,
+        {
+          method: 'GET',
+        },
+      )
+
+      const data = await response.json()
+
+      if (data.chatSessions?.length > 0) {
+        // console.log('Data', data.chatSessions)
+        setSideBarChats(data.chatSessions)
+        // console.log('Side Bar Data', data)
+      }
+    } catch (error) {
+      console.log('Error on Ferch Chats', error)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     if (!message.trim()) {
@@ -82,7 +106,12 @@ export function InputBar({
                 title: message,
                 response: data.reply,
                 sectionId: null,
-                SectionTitle: ` Chat Title ${message}`,
+                SectionTitle: `${
+                  message.length > 17
+                    ? message.slice(0, 16) + '...'
+                    : message.slice(0, 16)
+                }`,
+                userEmail: session?.user?.email,
               }),
             },
           )
@@ -90,6 +119,7 @@ export function InputBar({
           const newSectionId = saveChatData.sectionId
           setSectionId(newSectionId)
           sessionStorage.setItem('sectionId', newSectionId)
+          await fetchAllChats()
           console.log('Created new section chat', saveChatData.sectionId)
         } else {
           // Update Existing Section or Push just Chat Messages
@@ -137,25 +167,19 @@ export function InputBar({
               className="min-h-[60px] max-h-[200px]  bg-transparent border-0 text-white placeholder:text-white/40 resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  title=""
-                  type="submit"
-                  // disabled={!message.trim() || disabled}
-                  className="h-[60px] px-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl"
-                >
-                  <Send className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {message.trim() ? 'Submit Message' : 'Please Enter Prompt'}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+
+          <TooltipComp
+            text={message.trim() ? 'Submit Message' : 'Please Enter Prompt'}
+          >
+            <Button
+              title=""
+              type="submit"
+              // disabled={!message.trim() || disabled}
+              className="h-[60px] px-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl"
+            >
+              <Send className="w-5 h-5" />
+            </Button>
+          </TooltipComp>
         </div>
       </form>
     </div>

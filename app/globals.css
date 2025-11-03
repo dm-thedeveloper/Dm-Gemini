@@ -89,3 +89,17 @@
 .delay-1000 {
   animation-delay: 1000ms;
 }
+
+/* 
+.rotate-inifinite{
+  animation: rotate 0.2s linear infinite;
+}
+
+@keyframes rotate {
+  form{
+    rotate: 0deg;
+  }
+  to{
+    rotate:  360deg;
+  }
+} */

@@ -1,67 +1,53 @@
 'use client'
 
-import { Plus, MessageSquare } from 'lucide-react'
+import { Plus, MessageSquare, PanelLeftClose } from 'lucide-react'
 import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
 import { useEffect, useState } from 'react'
 import { appEndpoint } from '@/constants'
-
-interface Chat {
-  _id: string
-  title: string
-  timestamp: string
-}
+import { useSession } from 'next-auth/react'
+import { SideBarChats } from '@/types'
 
 interface ChatSidebarProps {
-  // chats: Chat[]
+  chats: SideBarChats[]
   activeChat: string | null
   onSelectChat: (id: string) => void
   onNewChat: () => void
+  // setSideBarChats: () => void
+  setSideBarChats: React.Dispatch<React.SetStateAction<SideBarChats[]>>
+  openSideBar: Boolean
+  setOpenSidebar: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export function ChatSidebar({
-  // chats,
+  chats,
   activeChat,
   onSelectChat,
   onNewChat,
+  setSideBarChats,
+  openSideBar,
+  setOpenSidebar,
 }: ChatSidebarProps) {
-  const [chats, setChats] = useState<Chat[]>([
-    // {
-    //   id: '1',
-    //   title: 'What is artificial intelligence?',
-    //   timestamp: '2 hours ago',
-    // },
-    // {
-    //   id: '2',
-    //   title: 'Help me write a story',
-    //   timestamp: 'Yesterday',
-    // },
-    // {
-    //   id: '3',
-    //   title: 'Explain quantum computing',
-    //   timestamp: '3 days ago',
-    // },
-    // {
-    //   id: '4',
-    //   title: 'Creative writing tips',
-    //   timestamp: '1 week ago',
-    // },
-  ])
+  const { data: session } = useSession()
+  console.log('Session', session?.user?.email)
 
   const [loading, setLoading] = useState<Boolean>(false)
 
   const fetchAllChats = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${appEndpoint}/api/get-side-bar-chats`, {
-        method: 'GET',
-      })
+      const response = await fetch(
+        `${appEndpoint}/api/get-side-bar-chats/${session?.user?.email}`,
+        {
+          method: 'GET',
+        },
+      )
 
       const data = await response.json()
 
       if (data.chatSessions?.length > 0) {
         // console.log('Data', data.chatSessions)
-        setChats(data.chatSessions)
+        setSideBarChats(data.chatSessions)
         // console.log('Side Bar Data', data)
       }
     } catch (error) {
@@ -76,7 +62,11 @@ export function ChatSidebar({
     })()
   }, [])
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-72 backdrop-blur-xl bg-white/10 border-r border-white/20 flex flex-col">
+    <aside
+      className={`fixed ${
+        openSideBar ? 'left-0' : 'left-[-200%] sm:left-0'
+      }  top-16 bottom-0 w-72 backdrop-blur-xl bg-white/10 border-r border-white/20 flex transition-all duration-200  z-30 flex-col`}
+    >
       <div className="p-4">
         <Button
           onClick={onNewChat}
@@ -87,7 +77,18 @@ export function ChatSidebar({
         </Button>
       </div>
 
-      <ScrollArea className="flex-1 px-4">
+      <button
+        onClick={(e) => {
+          e.preventDefault()
+          setOpenSidebar(false)
+        }}
+        className=" h-10 w-10 cursor-pointer backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-lg sm:hidden flex justify-center items-center text-white absolute -right-5 top-1/2 z-[10000] hover:scale-110"
+      >
+        {/* <PanelRight />{' '} */}
+        <PanelLeftClose />
+      </button>
+
+      <ScrollArea className="flex-1 px-4 overflow-y-auto">
         <div className="space-y-2 pb-4">
           {loading ? (
             <>
