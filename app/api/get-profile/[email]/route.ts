@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ConnectToMongoDB from '@/lib/connectdb'
-import User from '@/models/user' // Your user Mongoose model
+import User from '@/models/user'
 import { withCors } from '@/lib/cors'
 
-interface Params {
-  email: string
-}
-
-export async function GET(req: NextRequest, { params }: { params: Params }) {
-  // destructure params, no internal imports needed
+// No custom interface here; use default context
+export async function GET(req: NextRequest, context: any) {
   try {
-    // Connect to MongoDB
     await ConnectToMongoDB()
 
-    const { email } = params
-
+    // Use context.params directly
+    const email = context?.params?.email
     if (!email) {
       return NextResponse.json(
         { error: 'Missing Google email' },
@@ -22,14 +17,10 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
       )
     }
 
-    // Find user by Googleemail
     const user = await User.findOne({ email })
-
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
-
-    // Return user profile
 
     const profile = {
       name: user.name,
@@ -38,12 +29,8 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
       Googleemail: user.Googleemail,
       createdAt: user.createdAt,
     }
-    return withCors({ profile, status: true })
-    // return NextResponse.json(
-    //   {
-    //   success: true,
 
-    // })
+    return withCors({ profile, status: true })
   } catch (error: any) {
     console.error('Error fetching profile:', error)
     return NextResponse.json(
