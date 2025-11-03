@@ -3,19 +3,21 @@ import ConnectToMongoDB from '@/lib/connectdb'
 import User from '@/models/user' // Your user Mongoose model
 import { withCors } from '@/lib/cors'
 
-export async function GET(
-  req: NextRequest,
-  context: { params: { email: string } },
-) {
+interface Params {
+  email: string
+}
+
+export async function GET(req: NextRequest, { params }: { params: Params }) {
+  // destructure params, no internal imports needed
   try {
     // Connect to MongoDB
     await ConnectToMongoDB()
 
-    const { email } = context.params
+    const { email } = params
 
     if (!email) {
       return NextResponse.json(
-        { error: 'Missing Googleemail' },
+        { error: 'Missing Google email' },
         { status: 400 },
       )
     }
